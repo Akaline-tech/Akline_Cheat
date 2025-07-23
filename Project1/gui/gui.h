@@ -31,11 +31,18 @@ namespace main {
 		inline bool AntiSmoke = false;
 		inline bool SmokeColorChanger = false;
 		inline bool SmokeHalo = false;
+		inline bool Smoketimer = false;
+
+		inline bool AntiFlash = false;
+		inline float FlashMaxAlpha = 100.0f;
 	}
 	namespace rcs {
 
 		inline bool rcs = false;
 		inline int start_ammor = 1;
+	}
+	namespace bhop {
+		inline bool bhop = false;
 	}
 }
 

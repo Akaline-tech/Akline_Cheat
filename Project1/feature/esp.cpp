@@ -229,12 +229,17 @@ void draw_esp() {
 
 		uintptr_t local_pWeapon = *reinterpret_cast<uintptr_t*>(localpawn + cs2_dumper::schemas::client_dll::C_CSPlayerPawnBase::m_pClippingWeapon);
 
-		auto WeaponName = *reinterpret_cast<char*>(local_pWeapon + cs2_dumper::schemas::client_dll::C_CSPlayerPawnBase::m_pClippingWeapon);
 
 		uintptr_t pWeapon = *reinterpret_cast<uintptr_t*>(player_pawn + cs2_dumper::schemas::client_dll::C_CSPlayerPawnBase::m_pClippingWeapon);
 		if (!pWeapon)
 			continue;
 		auto WeaponInReload = *reinterpret_cast<bool*>(pWeapon + cs2_dumper::schemas::client_dll::C_CSWeaponBase::m_bInReload);
+
+		//char testpos[128];
+
+		//snprintf(testpos, sizeof(testpos), u8"test %llX ", (unsigned long long) m_flFlashMaxAlpha);
+		//ImGui::GetBackgroundDrawList()->AddLine(ImVec2(1000, 70), ImVec2(1920 / 2, 1080), IM_COL32(0, 255, 0, 255), 1.f);
+		//ImGui::GetBackgroundDrawList()->AddText(ImVec2(1000, 70), ImColor(255, 240, 255, 255), testpos);
 
 		if (main::visuals::halo) {
 
@@ -267,11 +272,8 @@ void draw_esp() {
 				);
 			}
 		}
-		char testpos[128];
 
-		snprintf(testpos, sizeof(testpos), u8"test %llX ", (unsigned long long)dwGameEntitySystem_highestyIndex);
-
-		ImGui::GetBackgroundDrawList()->AddText(ImVec2(1000, 70), ImColor(255, 240, 255, 255), testpos);
+		
 
 		if (!WorldToScreen(player_Origin, abs_pos_2d, Matrix, w, h)) { continue; }//不在屏幕中就跳过
 		if (!WorldToScreen(player_eyepos, head_pos_2d, Matrix, w, h)) { continue; }//不在屏幕中就跳过

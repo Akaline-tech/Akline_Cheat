@@ -13,7 +13,7 @@
 
 void draw_Menu() {
     // Set window rounding and fixed size
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 8.0f); // Slightly reduce corner radius
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 8.0f);
     ImGui::SetNextWindowSize(ImVec2(1000, 700), ImGuiCond_Always);
     ImGui::Begin("Akline.Tech", nullptr,
         ImGuiWindowFlags_NoResize |
@@ -24,11 +24,11 @@ void draw_Menu() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8, 4));
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(10, 10));
-        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 6.0f); // Child window rounding
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 6.0f);
 
         // Two-column layout: left button bar, right content area
         ImGui::Columns(2, "tabs", false);
-        ImGui::SetColumnWidth(0, 150.0f); // Fixed left column width
+        ImGui::SetColumnWidth(0, 150.0f);
 
         // Left button area
         static int selected_tab = 0; // 0=Visual, 1=Recoil
@@ -36,7 +36,6 @@ void draw_Menu() {
         {
             ImGui::Text("Akline.Tech");
             ImGui::Separator();
-            // Button style: highlight selected
             ImVec2 buttonSize(-FLT_MIN, 50);
 
             ImGui::PushStyleColor(ImGuiCol_Button, selected_tab == 0 ?
@@ -50,113 +49,181 @@ void draw_Menu() {
                 ImGui::GetStyle().Colors[ImGuiCol_Button]);
             if (ImGui::Button("RCS", buttonSize)) selected_tab = 1;
             ImGui::PopStyleColor();
+
+            ImGui::PushStyleColor(ImGuiCol_Button, selected_tab == 2 ?
+                ImGui::GetStyle().Colors[ImGuiCol_ButtonActive] :
+                ImGui::GetStyle().Colors[ImGuiCol_Button]);
+            if (ImGui::Button("Move", buttonSize)) selected_tab = 2;
+            ImGui::PopStyleColor();
         }
         ImGui::EndChild();
 
-        ImGui::NextColumn(); // Switch to right content column
+        ImGui::NextColumn();
 
-        // Right content area - use fixed height to avoid squeezing
+        // Right content area
         ImGui::BeginChild("##Content", ImVec2(0, ImGui::GetContentRegionAvail().y), true, ImGuiWindowFlags_AlwaysUseWindowPadding);
         {
             if (selected_tab == 0) { // Visual page
-                // Calculate available height minus spacing
-                float content_height = ImGui::GetContentRegionAvail().y - ImGui::GetStyle().ItemSpacing.y;
+                // 使用两列布局
+                ImGui::Columns(2, "visualColumns", false);
 
-                // Left: ESP settings group box (60% width)
-                ImGui::BeginChild("##ESPSettings", ImVec2(ImGui::GetContentRegionAvail().x * 0.6f, content_height), true);
+                // 第一列 (ESP设置)
+                ImGui::BeginGroup();
                 {
-                    // Group box title
+                    // Box Settings
+                    ImGui::BeginChild("Box Settings", ImVec2(0, 280), true, ImGuiWindowFlags_AlwaysAutoResize);
+                    {
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.6f, 1.0f, 1.0f));
+                        ImGui::SetCursorPos(ImVec2(15, 8));
+                        ImGui::Text("Box Settings");
+                        ImGui::PopStyleColor();
+                        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
+
+                        ImGui::Checkbox("Box ESP", &main::visuals::box);
+                        ImGui::SameLine();
+                        ImGui::SetNextItemWidth(120);
+                        ImGui::SliderFloat("Thickness##1", &main::visuals::Box_Thickness, 1.0f, 5.0f);
+                        ImGui::SameLine();
+                        ImGui::ColorEdit4("##BoxColor", (float*)&main::visuals::box_color,
+                            ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+
+                        ImGui::Checkbox("Fill Box", &main::visuals::boxFill);
+                        ImGui::SameLine();
+                        ImGui::ColorEdit4("##FillColor", (float*)&main::visuals::Fill_color,
+                            ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+
+                        ImGui::Checkbox("Skeleton", &main::visuals::bone);
+
+                        ImGui::Checkbox("Show Name", &main::visuals::name);
+                   
+                        ImGui::Checkbox("Show Health", &main::visuals::health);
+                     
+                        ImGui::Checkbox("Reload Status", &main::visuals::Reload);
+                        
+                        ImGui::Checkbox("Team Filter", &main::visuals::team);
+                    }
+                    ImGui::EndChild();
+
+                    ImGui::Spacing();
+
+                    // Halo Settings
+                    ImGui::BeginChild("Halo Settings", ImVec2(0, 220), true, ImGuiWindowFlags_AlwaysAutoResize);
+                    {
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.6f, 1.0f, 1.0f));
+                        ImGui::SetCursorPos(ImVec2(15, 8));
+                        ImGui::Text("Halo Settings");
+                        ImGui::PopStyleColor();
+                        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
+
+                        ImGui::Checkbox("Player Halo", &main::visuals::halo);
+                        ImGui::SameLine();
+                        ImGui::ColorEdit4("##HaloColor", (float*)&main::visuals::halo_color,
+                            ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+
+                        ImGui::SetNextItemWidth(120);
+                        ImGui::SliderFloat("Radius", &main::visuals::radius, 5.0f, 250.0f);
+                        ImGui::SameLine();
+                        ImGui::SetNextItemWidth(120);
+                        ImGui::SliderInt("Segments", &main::visuals::segments, 12, 64);
+
+                        ImGui::Checkbox("Head Marker", &main::visuals::head);
+                    }
+                    ImGui::EndChild();
+
+                    ImGui::Spacing();
+
+                    // Line Settings
+                    ImGui::BeginChild("Line Settings", ImVec2(0, 230), true, ImGuiWindowFlags_AlwaysAutoResize);
+                    {
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.6f, 1.0f, 1.0f));
+                        ImGui::SetCursorPos(ImVec2(15, 8));
+                        ImGui::Text("Line Settings");
+                        ImGui::PopStyleColor();
+                        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
+
+                        ImGui::Checkbox("Direction Line", &main::visuals::Line);
+                        ImGui::SameLine();
+                        ImGui::SetNextItemWidth(120);
+                        ImGui::SliderFloat("Thickness##2", &main::visuals::Line_Thickness, 1.0f, 5.0f);
+                    }
+                    ImGui::EndChild();
+                }
+                ImGui::EndGroup();
+
+                // 第二列 (烟雾设置)
+                ImGui::NextColumn();
+
+                ImGui::BeginChild("Smoke Settings", ImVec2(0, 280), true, ImGuiWindowFlags_AlwaysAutoResize);
+                {
                     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.6f, 1.0f, 1.0f));
                     ImGui::SetCursorPos(ImVec2(15, 8));
-                    ImGui::Text("ESP Settings");
+                    ImGui::Text("Smoke Settings");
                     ImGui::PopStyleColor();
                     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
 
-                    // ESP settings controls
-                    ImGui::Checkbox("Box ESP", &main::visuals::box);
-                    ImGui::SameLine();
-                    ImGui::SetNextItemWidth(150);
-                    ImGui::SliderFloat("Box Thickness##1", &main::visuals::Box_Thickness, 1.0f, 5.0f);
+                    ImGui::Checkbox("Anti Smoke", &main::visuals::AntiSmoke);
 
-                    ImGui::Checkbox("Fill Box", &main::visuals::boxFill);
-                    ImGui::Checkbox("Skeleton", &main::visuals::bone);
-                    ImGui::Checkbox("Show Name", &main::visuals::name);
-                    ImGui::Checkbox("Reload Status", &main::visuals::Reload);
-
-                    ImGui::Checkbox("Direction Line", &main::visuals::Line);
-                    ImGui::SameLine();
-                    ImGui::SetNextItemWidth(150);
-                    ImGui::SliderFloat("Line Thickness##2", &main::visuals::Line_Thickness, 1.0f, 5.0f);
-
-                    ImGui::Checkbox("Player Halo", &main::visuals::halo);
-                    ImGui::SameLine();
-                    ImGui::SetNextItemWidth(150);
-                    ImGui::SliderFloat("Halo Radius", &main::visuals::radius, 5.0f, 250.0f);
-                    ImGui::SameLine();
-                    ImGui::SetNextItemWidth(150);
-                    ImGui::SliderInt("Halo Segments", &main::visuals::segments, 12, 64);
-
-                    ImGui::Checkbox("Head Marker", &main::visuals::head);
-                    ImGui::Checkbox("Show Health", &main::visuals::health);
-                    ImGui::Checkbox("Team Filter", &main::visuals::team);
-                    ImGui::Checkbox("Anti-Smoke", &main::visuals::AntiSmoke);
                     ImGui::Checkbox("Smoke Halo", &main::visuals::SmokeHalo);
+                    ImGui::SameLine();
+                    ImGui::ColorEdit4("##SmokeHaloColor", (float*)&main::visuals::smoke_halo_color,
+                        ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+
                     ImGui::Checkbox("Smoke Color Changer", &main::visuals::SmokeColorChanger);
+                    ImGui::SameLine();
+                    ImGui::ColorEdit3("##SmokeColor", (float*)&main::visuals::smoke_color,
+                        ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+
+                    ImGui::Checkbox("Smoke Timer", &main::visuals::Smoketimer);
+
+                    ImGui::Checkbox("Anti Flash", &main::visuals::AntiFlash);
+                    ImGui::SliderFloat("FlashAlpha", &main::visuals::FlashMaxAlpha, 0.0f, 100.0f);
                 }
                 ImGui::EndChild();
 
-                ImGui::SameLine(); // Ensure right box is on same line
-
-                // Right: Color adjustment group box (40% width)
-                ImGui::BeginChild("##ColorSettings", ImVec2(0, content_height), true);
-                {
-                    // Group box title
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.6f, 1.0f, 1.0f));
-                    ImGui::SetCursorPos(ImVec2(15, 8));
-                    ImGui::Text("Color Settings");
-                    ImGui::PopStyleColor();
-                    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
-
-                    ImGui::ColorEdit4("Box Color", (float*)&main::visuals::box_color, ImGuiColorEditFlags_NoInputs);
-                    ImGui::ColorEdit4("Fill Color", (float*)&main::visuals::Fill_color, ImGuiColorEditFlags_NoInputs);
-                    ImGui::ColorEdit4("Halo Color", (float*)&main::visuals::halo_color, ImGuiColorEditFlags_NoInputs);
-                    ImGui::ColorEdit3("Smoke Color", (float*)&main::visuals::smoke_color, ImGuiColorEditFlags_NoInputs);
-                    ImGui::ColorEdit4("Smoke Halo Color", (float*)&main::visuals::smoke_halo_color, ImGuiColorEditFlags_NoInputs);
-                    ImGui::Dummy(ImVec2(0, 20));
-                }
-                ImGui::EndChild();
+                // 恢复单列布局
+                ImGui::Columns(1);
             }
             else if (selected_tab == 1) { // Recoil page
-                // Recoil settings group box
-                ImGui::BeginChild("##AimbotSettings", ImVec2(0, 0), true);
+                // Recoil settings
+                ImGui::BeginChild("##RCSettings", ImVec2(0, 0), true);
                 {
-                    // Group box title
                     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.6f, 1.0f, 1.0f));
                     ImGui::SetCursorPos(ImVec2(15, 8));
-                    ImGui::Text("Recoil Settings");
+                    ImGui::Text("Recoil Control Settings");
                     ImGui::PopStyleColor();
                     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
 
-        
-                    ImGui::Separator();
                     ImGui::Checkbox("RCS", &main::rcs::rcs);
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(200);
                     ImGui::SliderInt("After Bullet Count", &main::rcs::start_ammor, 0, 30);
+                    ImGui::SliderFloat("X##1", &main::visuals::xA, 0.f, 30.f);
+                    ImGui::SliderFloat("Y##1", &main::visuals::yA, 0.f, 30.f);
                     ImGui::Text("Other settings are under development.");
-                    //ImGui::SliderFloat("Recoil X", &main::visuals::xA, 0.f, 5.f);Other settings are under development.
-                    //ImGui::SliderFloat("Recoil Y", &main::visuals::yA, 0.f, 5.f);
+                }
+                ImGui::EndChild();
+            }
+            else if (selected_tab == 2) {
+                ImGui::BeginChild("##BHOPettings", ImVec2(0, 0), true);
+                {
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.6f, 1.0f, 1.0f));
+                    ImGui::SetCursorPos(ImVec2(15, 8));
+                    ImGui::Text("bunny hop Settings");
+                    ImGui::PopStyleColor();
+                    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
+
+                    ImGui::Checkbox("BHop", &main::bhop::bhop);
                 }
                 ImGui::EndChild();
             }
         }
         ImGui::EndChild();
 
-        ImGui::Columns(1); // Restore single column layout
-        ImGui::PopStyleVar(5); // Restore all styles
+        ImGui::Columns(1);
+        ImGui::PopStyleVar(5);
     }
     ImGui::End();
-    ImGui::PopStyleVar(); // Window rounding
+    ImGui::PopStyleVar();
 }
 /*
 #include <imgui.h>

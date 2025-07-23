@@ -1344,7 +1344,7 @@ namespace cs2_dumper {
                 constexpr std::ptrdiff_t m_flSpawnTime = 0x11A8; // GameTime_t
                 constexpr std::ptrdiff_t vecLastTrailLinePos = 0x11AC; // Vector
                 constexpr std::ptrdiff_t flNextTrailLineTime = 0x11B8; // GameTime_t
-                constexpr std::ptrdiff_t m_bExplodeEffectBegan = 0x11BC; // bool
+                constexpr std::ptrdiff_t m_bExplodeEffectBegan = 0x11BC; // bool Spawned
                 constexpr std::ptrdiff_t m_bCanCreateGrenadeTrail = 0x11BD; // bool
                 constexpr std::ptrdiff_t m_nSnapshotTrajectoryEffectIndex = 0x11C0; // ParticleIndex_t
                 constexpr std::ptrdiff_t m_hSnapshotTrajectoryParticleSnapshot = 0x11C8; // CStrongHandle<InfoForResourceTypeIParticleSnapshot>

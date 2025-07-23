@@ -10,6 +10,9 @@
 #include "feature/esp.h"
 #include <rcs.h>
 #include <Smoke.h>
+#include <flashBang.h>
+#include <bhop.h>
+#include <offsets.hpp>
 
 static ID3D11Device* g_pd3dDevice = nullptr;
 static IDXGISwapChain* g_pSwapChain = nullptr;
@@ -29,7 +32,7 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND, UINT, WPARAM, LPARAM);
 
 LRESULT __stdcall WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     // 处理Insert键按下事件
-    if (uMsg == WM_KEYDOWN && wParam == VK_INSERT) {
+    if (uMsg == WM_KEYDOWN && wParam == VK_HOME) {//VK_INSERT
         g_menuOpen = !g_menuOpen;  // 切换菜单状态
     }
 
@@ -99,8 +102,7 @@ long __stdcall my_present(IDXGISwapChain* _this, UINT a, UINT b) {
     }
 
     AntiSmoke();
-
-    
+    AntiFlashBang();
 
     ImGui::EndFrame();
 
@@ -111,6 +113,14 @@ long __stdcall my_present(IDXGISwapChain* _this, UINT a, UINT b) {
     return ((Present)origin_present)(_this, a, b);
 }
 
+static bool(__fastcall* fnOriginalCreateMove)(void*, int, CUserCMD*) = nullptr;
+static bool __fastcall hkCreateMove(void* pCSGOInput, int nSlot, CUserCMD* pcmd) {
+    bool bResult = fnOriginalCreateMove(pCSGOInput, nSlot, pcmd);
+    
+    bhop(pcmd);
+
+    return bResult;
+}
 
 DWORD create(void*) {
     const unsigned level_count = 2;
@@ -147,6 +157,15 @@ DWORD create(void*) {
         g_pd3dDevice->Release();
         g_pSwapChain->Release();
     }
+
+    const auto client = reinterpret_cast<uintptr_t>(GetModuleHandle(L"client.dll"));
+
+    void* pCCSGOInput = reinterpret_cast<void*>(client + cs2_dumper::offsets::client_dll::dwCSGOInput);
+
+    void* pfnCreateMove = (*reinterpret_cast<void***>(pCCSGOInput))[21];
+
+    MH_CreateHook(pfnCreateMove, hkCreateMove, reinterpret_cast<void**>(&fnOriginalCreateMove));
+    MH_EnableHook(pfnCreateMove);
 
     return 0;
 }

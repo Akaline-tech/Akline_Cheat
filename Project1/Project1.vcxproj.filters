@@ -75,6 +75,15 @@
     <ClInclude Include="feature\function.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="feature\flashBang.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="feature\bhop.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CUserCMD.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="feature\esp.cpp">
@@ -114,6 +123,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="feature\function.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="feature\flashBang.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="feature\bhop.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
